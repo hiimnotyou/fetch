@@ -5,16 +5,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Domain Checker</title>
+    <title>Domain Availability Checker</title>
 </head>
 <body>
     <h1>Domain Availability Checker</h1>
-    <button id="checkButton">Check Availability</button>
+
+    <label for="callbackInput">Enter Callback Function Name:</label>
+    <input type="text" id="callbackInput" placeholder="handleResults">
+    <br>
+
+    <button onclick="checkAvailability()">Check Availability</button>
+
+    <h2>Results:</h2>
     <div id="results"></div>
 
     <script>
-        document.getElementById('checkButton').addEventListener('click', () => {
-            fetch('/api/checkDomains')
+        function checkAvailability() {
+            const callbackFunction = document.getElementById('callbackInput').value;
+            const apiUrl = `/api/checkDomains?callback=${callbackFunction}`;
+
+            fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
                     const resultsContainer = document.getElementById('results');
@@ -27,7 +37,7 @@
                     });
                 })
                 .catch(error => console.error('Error fetching data:', error));
-        });
+        }
     </script>
 </body>
 </html>
