@@ -20,30 +20,37 @@
     <div id="results"></div>
 
     <script>
-        function checkAvailability() {
-            const domainInput = document.getElementById('domainInput');
-            const domain = domainInput.value;
+function checkAvailability() {
+    const domainInput = document.getElementById('domainInput');
+    const domain = domainInput.value;
 
-            // Split the domain into parts (name and extension)
-            const [name, extension] = domain.split('.');
+    const [name, extension] = domain.split('.');
+    const apiUrl = `/api/checkDomains/${name}/${extension}`;
 
-            // Construct the full API URL
-            const apiUrl = `/api/checkDomains/${name}/${extension}`;
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
 
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    const resultsContainer = document.getElementById('results');
-                    resultsContainer.innerHTML = '';
+            data.results.forEach(result => {
+                const resultElement = document.createElement('p');
+                resultElement.textContent = `${result.domain}: ${result.isAvailable ? 'Available' : 'Not Available'}`;
+                resultsContainer.appendChild(resultElement);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            return response.text();
+        })
+        .then(text => console.log('Raw response:', text));
+}
 
-                    data.results.forEach(result => {
-                        const resultElement = document.createElement('p');
-                        resultElement.textContent = `${result.domain}: ${result.isAvailable ? 'Available' : 'Not Available'}`;
-                        resultsContainer.appendChild(resultElement);
-                    });
-                })
-                .catch(error => console.error('Error fetching data:', error));
-        }
     </script>
 </body>
 </html>
