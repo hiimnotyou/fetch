@@ -10,6 +10,10 @@
 <body>
     <h1>Domain Availability Checker</h1>
 
+    <label for="domainInput">Enter Domain:</label>
+    <input type="text" id="domainInput" placeholder="example">
+    <br>
+
     <label for="callbackInput">Enter Callback Function Name:</label>
     <input type="text" id="callbackInput" placeholder="handleResults">
     <br>
@@ -21,8 +25,11 @@
 
     <script>
         function checkAvailability() {
+            const domain = document.getElementById('domainInput').value;
             const callbackFunction = document.getElementById('callbackInput').value;
-            const apiUrl = `/api/checkDomains?callback=${callbackFunction}`;
+
+            // Construct the full API URL
+            const apiUrl = `/api/checkDomains/${domain}?callback=${callbackFunction}`;
 
             fetch(apiUrl)
                 .then(response => response.json())
