@@ -1,56 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Domain Availability Checker</title>
-</head>
-<body>
-    <h1>Domain Availability Checker</h1>
+function checkAvailability() {
+    const domainInput = document.getElementById('domainInput');
+    const domain = domainInput.value;
 
-    <label for="domainInput">Enter Domain:</label>
-    <input type="text" id="domainInput" placeholder="example.com">
-    <br>
+    const [name, extension] = domain.split('.');
+    const apiUrl = `/api/checkDomains/${name}/${extension}`;
 
-    <button onclick="checkAvailability()">Check Availability</button>
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
 
-    <h2>Results:</h2>
-    <div id="results"></div>
-
-    <script>
-        function checkAvailability() {
-            const domainInput = document.getElementById('domainInput');
-            const domain = domainInput.value;
-
-            // Split the domain into parts (name and extension)
-            const [name, extension] = domain.split('.');
-
-            // Construct the full API URL
-            const apiUrl = `/api/checkDomains/${name}/${extension}`;
-
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const resultsContainer = document.getElementById('results');
-                    resultsContainer.innerHTML = '';
-
-                    data.results.forEach(result => {
-                        const resultElement = document.createElement('p');
-                        resultElement.textContent = `${result.domain}: ${result.isAvailable ? 'Available' : 'Not Available'}`;
-                        resultsContainer.appendChild(resultElement);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    return response.text();
-                })
-                .then(text => console.log('Raw response:', text));
-        }
-    </script>
-</body>
-</html>
+            data.results.forEach(result => {
+                const resultElement = document.createElement('p');
+                resultElement.textContent = `${result.domain}: ${result.isAvailable ? 'Available' : 'Not Available'}`;
+                resultsContainer.appendChild(resultElement);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            return error.response.text();
+        })
+        .then(text => console.log('Raw response:', text));
+}
